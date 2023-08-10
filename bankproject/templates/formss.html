@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block body %}
+
+
+<div style="padding-left:50px;">
+
+ <form  id="formss" method="POST">
+    {% csrf_token %}
+   <br> <input type="text" name="username" placeholder="enter your name" required><br>
+    <br><input type="date" name="dob" placeholder="Enter your dob" required><br>
+  <br>  <input type="text" name="age" placeholder="Enter your age" required><br>
+    <br><label>Gender</label>
+    <input type="radio" name="gender" value="male">Male
+    <input type="radio" name="gender" value="male">Female<br>
+    <br><input type="text" name="number" placeholder="Enter your phone number" required><br>
+    <br><input type="email" name="email" placeholder="Enter your email" required><br>
+    <br><input type="text" name="address" placeholder="Enter your address" required><br>
+    <br><select id="district" name="district">
+        <option value="">Select district</option>
+        {% for district in district %}
+        <option value="{{district.id}}">{{district.name}}</option>
+        {% endfor %}
+    </select><br>
+    <br><select id="branch" name="branch">
+        <option value="">Select branch</option>
+    </select>
+    <br>
+    <br><select id="place" name="place">
+        <option value="">Account</option>
+        {% for place in place %}
+        <option value="{{place.id}}">{{place.name}}</option>
+        {% endfor %}
+    </select><br>
+   <br> <label>Material</label><br>
+    <input type="checkbox" name="material" value="debit card">Debit
+    <input type="checkbox" name="material" value="credit card">Credit
+    <input type="checkbox" name="material" value="cheque book">Cheque
+    <br><button class="btn btn-primary" type="submit">Submit</button>
+     <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+  </form>
+</div>
+
+<script src="https://code.jquery.com/Jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+            $('#district').on('change', function() {
+                const districtId = $(this).val();
+                $('#branch').empty().append($('<option>').text('Select Branch'));
+                if (districtId) {
+                    $.get(`/get-branches/?district_id=${districtId}`, function(data) {
+                        $.each(data, function(index, branch) {
+                            $('#branch').append($('<option>').val(branch.id).text(branch.name));
+                        });
+                    });
+                }
+            });
+            $(document).ready(function() {
+    // Get the CSRF token value from the form
+    const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+    $('#formss').on('submit', function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+
+        // Send the CSRF token in the request headers
+        $.ajax({
+            url: '/formss/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            data: formData,
+            success: function() {
+                // Redirect to the 'final' page after successful form submission
+                window.location.href = '/final/';
+            }
+        });
+    });
+});
+
+<!--            $('#user-form').on('submit', function(event) {-->
+<!--                event.preventDefault();-->
+<!--                const formData = $(this).serialize();-->
+<!--                // Use AJAX to submit form data to your Django view-->
+<!--            });-->
+
+
+        });
+
+
+</script>
+{% endblock %}
